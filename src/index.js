@@ -94,7 +94,7 @@ export const visitor = (visitor, defineIds = []) => {
             set(newVal) {
               val = newVal
               setTimeout(() => {
-                expose(newVal)
+                newVal && expose(newVal.exports)
               }, 0);
             }
           })
