@@ -32,7 +32,11 @@ const resolve_chunk = (chunk, cb) => {
 }
 
 const intercept_push = (initChunks, cb) => {
-  let _push = initChunks.push
+  const w_push = initChunks.push.bind(initChunks)
+  let _push = (...args) => {
+    resolve_chunk(args[0], cb)
+    return w_push(...args)
+  }
   Object.defineProperty(initChunks, 'push', {
     configurable: true,
     get() {
@@ -41,7 +45,7 @@ const intercept_push = (initChunks, cb) => {
     set(newPush) {
       _push = (...args) => {
         resolve_chunk(args[0], cb)
-        return new newPush(...args)
+        return newPush(...args)
       }
     } 
   })
