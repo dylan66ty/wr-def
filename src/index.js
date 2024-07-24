@@ -31,21 +31,41 @@ const resolve_chunk = (chunk, cb) => {
   })
 }
 
-const ready = (initChunks, cb) => {
-  const _push = initChunks.push
-  function Wrap(...args) {
-    resolve_chunk(args[0], cb)
-    return _push.apply(initChunks, args)
-  }
+const intercept_push = (initChunks, cb) => {
+  let _push = initChunks.push
   Object.defineProperty(initChunks, 'push', {
+    configurable: true,
     get() {
-      return Wrap
+      return _push
     },
-    set(v) {
-      Wrap = v
-    }
+    set(newPush) {
+      _push = (...args) => {
+        resolve_chunk(args[0], cb)
+        return new newPush(...args)
+      }
+    } 
   })
 }
+
+
+export const intercept_webpack_modules = (__chunks_key__, cb) => {
+  if (!__chunks_key__) return
+
+  let ori_chunks = window[__chunks_key__]
+  Object.defineProperty(window, __chunks_key__, {
+    get() {
+      return ori_chunks
+    },
+    set(newChunks) {
+      if (newChunks) {
+        intercept_push(newChunks, cb)
+      }
+      ori_chunks = newChunks
+    },
+  })
+}
+
+
 
 export const visitor = (visitor, defineIds = []) => {
   let toString = Object.prototype.toString
@@ -103,28 +123,6 @@ export const visitor = (visitor, defineIds = []) => {
     }, 0);
   }
 }
-
-
-export const intercept_webpack_modules = (__chunks_key__, cb) => {
-  if (!__chunks_key__) return
-  let ori_chunks = window[__chunks_key__]
-  Object.defineProperty(window, __chunks_key__, {
-    get() {
-      return ori_chunks
-    },
-    set(newChunks) {
-      if (
-        newChunks &&
-        newChunks.length === 1 &&
-        Object.prototype.hasOwnProperty.bind(newChunks, 'push')
-      ) {
-        ready(newChunks, cb)
-      }
-      ori_chunks = newChunks
-    },
-  })
-}
-
 
 
 
