@@ -93,7 +93,6 @@ export const visitor = (visitor, defineIds = []) => {
             },
             set(newVal) {
               val = newVal
-              modules[id] = newVal
               setTimeout(() => {
                 expose(newVal)
               }, 0);

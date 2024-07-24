@@ -1,6 +1,6 @@
 {
   "name": "wr-def",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "拿到webpack打包后所有模块",
   "main": "dist/index.js",
   "type": "module",
