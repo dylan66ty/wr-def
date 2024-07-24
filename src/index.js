@@ -71,7 +71,7 @@ export const visitor = (visitor, defineIds = []) => {
           return
         }
         if (isObject(value)) {
-          visitor.object && visitor.object(key, value)
+          visitor.object && visitor.object(key, value, exports)
           return
         }
       })
