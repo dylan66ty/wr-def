@@ -1,14 +1,14 @@
 const __moduleLoadedObserver = (module, cb) => {
-  let load = module.l
-  if(load) {
+  let _loaded = module.loaded
+  if(_loaded) {
     cb(module)
   } else {
-    Object.defineProperty(module, 'l', {
+    Object.defineProperty(module, 'loaded', {
       get(){
-        return load
+        return _loaded
       },
       set(loaded) {
-        load = loaded
+        _loaded = loaded
         if(loaded) {
           cb(module)
         }
@@ -41,7 +41,7 @@ const __interceptAllModules = (args, cb, moduleIds) => {
     if(module) {
       __moduleLoadedObserver(module, cb)
     } else {
-      Object.defineProperty(module, id, {
+      Object.defineProperty(modules, id, {
         get() {
           return module
         },
