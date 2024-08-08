@@ -1,15 +1,15 @@
 const __moduleLoadedObserver = (module, cb) => {
   let _loaded = module.loaded
-  if(_loaded) {
+  if (_loaded) {
     cb(module)
   } else {
     Object.defineProperty(module, 'loaded', {
-      get(){
+      get() {
         return _loaded
       },
       set(loaded) {
         _loaded = loaded
-        if(loaded) {
+        if (loaded) {
           cb(module)
         }
       }
@@ -33,12 +33,12 @@ const __interceptAllModules = (args, cb, moduleIds) => {
   } catch (error) {
   }
   delete Object.prototype.___dylan66ty___
-  
+
   window.__$modules = modules
 
   moduleIds.forEach(id => {
     let module = modules[id]
-    if(module) {
+    if (module) {
       __moduleLoadedObserver(module, cb)
     } else {
       Object.defineProperty(modules, id, {
@@ -84,10 +84,9 @@ const intercept_push = (initChunks, cb, moduleIds) => {
         resolve_chunk(args[0], cb, moduleIds)
         return newPush(...args)
       }
-    } 
+    }
   })
 }
-
 
 export const intercept_webpack_modules = (__chunks_key__, cb, moduleIds = []) => {
   if (!__chunks_key__) return
@@ -105,6 +104,38 @@ export const intercept_webpack_modules = (__chunks_key__, cb, moduleIds = []) =>
     },
   })
 }
+
+export const visitor = (visitor) => {
+  const toString = Object.prototype.toString
+  const isFunction = (value) => toString.call(value) === '[object Function]'
+  const isObject = (value) => toString.call(value) === '[object Object]'
+  const isModule = (value) => toString.call(value) === '[object Module]'
+  const isElement = (value) => value && value instanceof Element
+  return (module) => {
+    const exports = module.exports
+    if (isObject(exports)) {
+      for (const [key, value] of Object.entries(exports)) {
+        if (isObject(value)) {
+          visitor.obj && visitor.obj(key, value, exports)
+          return
+        }
+        if (isFunction(value)) {
+          visitor.func && visitor.func(key, value, exports)
+          return
+        }
+      }
+      return
+    }
+    if (isModule(exports)) {
+      visitor.module && visitor.module(exports)
+      return
+    }
+    if (isElement(exports)) {
+      visitor.el && visitor.el(exports)
+    }
+  }
+}
+
 
 
 

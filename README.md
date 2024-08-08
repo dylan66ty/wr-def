@@ -14,15 +14,26 @@ npm i wr-def
 # 使用 
 
 ```js
-import { intercept_webpack_modules } from 'wr-def'
+import { intercept_webpack_modules, visitor} from 'wr-def'
 
-const exposedModule= (module) => {
-    console.log(module)
-}
+const exposedModule = visitor({
+        obj(key,value,exports){
+            
+        },
+        func(key,value,exports){
+
+        }
+        module(exports){
+            
+        },
+        el(exports){
+            
+        }
+    })
 
 const allModuleIds = [模块id...]
 
-intercept_webpack_modules('webpackJson', exposedModule,allModuleIds)
+intercept_webpack_modules('webpackJson', exposedModule, allModuleIds)
 ```
 
 # 注意
