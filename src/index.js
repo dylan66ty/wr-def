@@ -117,11 +117,8 @@ export const visitor = (visitor) => {
       for (const [key, value] of Object.entries(exports)) {
         if (isObject(value)) {
           visitor.obj && visitor.obj(key, value, exports)
-          return
-        }
-        if (isFunction(value)) {
+        } else if (isFunction(value)) {
           visitor.func && visitor.func(key, value, exports)
-          return
         }
       }
       return
